@@ -134,3 +134,35 @@ class ConditionalUNet(nn.Module):
         x = self.conv6(x)
 
         return x
+
+# Function to calculate the loss based on:
+def get_loss(model, x_0, t, y):
+    noise = torch.randn_like(x_0)
+    x_noisy = q_sample(x_0, t, noise)
+    noise_pred = model(x_noisy, t, y)
+    return F.mse_loss(noise_pred, noise)
+
+
+model = ConditionalUNet().to(device)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+def train_model(Epochs=EPOCHS):
+  for epoch in range(EPOCHS):
+    for batch in train_loader:
+      x, y = batch
+      x = x.to(device)
+      y = y.to(device)
+
+      t = torch.randint(0, T, (x.size(0),), device=device).long()
+      loss = get_loss(model, x, t, y)
+
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
+
+    print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {loss.item():.6f}")
+    if (epoch+1) % 10 == 0:
+      torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
+      print(f"Model saved at epoch {epoch+1}")
+      generate_image_for_label(model, label=3)
+
