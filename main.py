@@ -147,7 +147,7 @@ model = ConditionalUNet().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
 def train_model(Epochs=EPOCHS):
-  for epoch in range(EPOCHS):
+  for epoch in range(Epochs):
     for batch in train_loader:
       x, y = batch
       x = x.to(device)
