@@ -161,4 +161,43 @@ def train_model(Epochs=EPOCHS):
       optimizer.step()
 
     print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {loss.item():.6f}")
+    if (epoch+1) % 10 == 0:
+      torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
+      print(f"Model saved at epoch {epoch+1}")
+      generate_image_for_label(model, label=3)
 
+
+@torch.no_grad()
+def sample_ddpm(model, num_samples, label, T=200):
+    model.eval()
+    x = torch.randn((num_samples, 1, 28, 28), device=device)  # Start from noise
+    y = torch.full((num_samples,), label, dtype=torch.long, device=device)  # Condition on class
+
+    for t in reversed(range(T)):
+        t_tensor = torch.full((num_samples,), t, device=device, dtype=torch.long)
+        z = torch.randn_like(x) if t > 0 else torch.zeros_like(x)  # Add noise except at t=0
+        beta_t = betas[t]
+        alpha_t = alphas[t]
+        alpha_bar_t = alphas_cumprod[t]
+
+        eps_theta = model(x, t_tensor, y)
+
+        # Reverse diffusion formula
+        x = (1 / torch.sqrt(alpha_t)) * (x - (1 - alpha_t) / torch.sqrt(1 - alpha_bar_t) * eps_theta) + torch.sqrt(beta_t) * z
+
+    return x
+
+
+def generate_image_for_label(model, label):
+    print(f"Generating image for digit: {label}")
+    images = sample_ddpm(model, num_samples=1, label=label)
+    image = images[0].squeeze().cpu().numpy()
+
+    # Plotting
+    plt.imshow(image, cmap="gray")
+    plt.axis("off")
+    plt.title(f"Generated Digit: {label}")
+    plt.show()
+
+train_model()
+generate_image_for_label(model, label=3)
