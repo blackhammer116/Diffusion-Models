@@ -161,8 +161,4 @@ def train_model(Epochs=EPOCHS):
       optimizer.step()
 
     print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {loss.item():.6f}")
-    if (epoch+1) % 10 == 0:
-      torch.save(model.state_dict(), f"model_epoch_{epoch+1}.pth")
-      print(f"Model saved at epoch {epoch+1}")
-      generate_image_for_label(model, label=3)
 
