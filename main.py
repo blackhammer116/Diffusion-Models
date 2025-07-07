@@ -30,13 +30,14 @@ print(f"Image shape: {images.shape}")
 
 # Beta Scheduler(linear scheduler)
 T = 200 # scheduler steps
-betas = torch.linspace(0.0001, 0.02, T).to(device) # Move to device
+betas = torch.linspace(0.0001, 0.02, T).to(device)
 alphas = 1. - betas
-alphas_cumprod = torch.cumprod(alphas, axis=0).to(device) # Move to device
-sqrt_alphas_cumprod = torch.sqrt(alphas_cumprod).to(device) # Move to device
-sqrt_one_minus_alphas_cumprod = torch.sqrt(1 - alphas_cumprod).to(device) # Move to device
+alphas_cumprod = torch.cumprod(alphas, axis=0).to(device)
+sqrt_alphas_cumprod = torch.sqrt(alphas_cumprod).to(device)
+sqrt_one_minus_alphas_cumprod = torch.sqrt(1 - alphas_cumprod).to(device)
 
-# Noise addition
+# Noise addition function based on:
+# x_t​= sqrt(α_t) * x_0 + sqrt(1 − α_t) * ϵ
 def q_sample(x_start, t, noise=None):
     """
     Add noise to x_start at timestep t.
@@ -135,7 +136,7 @@ class ConditionalUNet(nn.Module):
 
         return x
 
-# Function to calculate the loss based on:
+# Function to calculate the loss between the predicted noise and the actual noise
 def get_loss(model, x_0, t, y):
     noise = torch.randn_like(x_0)
     x_noisy = q_sample(x_0, t, noise)
