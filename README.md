@@ -1,6 +1,8 @@
 # **Diffusion Model for MNIST Digit Text to Image Generation**
 This project implements a conditional diffusion model to generate MNIST digits using PyTorch. The model is based on a U-Net architecture and incorporates conditional embeddings for time steps and class labels.
 
+!["UNet"](./UNet.jpg)
+
 ## **Features**
 * Conditional U-Net architecture for digit generation.
 * Linear beta scheduler for noise addition and reverse diffusion.

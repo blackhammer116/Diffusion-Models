@@ -37,7 +37,7 @@ sqrt_alphas_cumprod = torch.sqrt(alphas_cumprod).to(device)
 sqrt_one_minus_alphas_cumprod = torch.sqrt(1 - alphas_cumprod).to(device)
 
 # Noise addition function based on:
-# x_t​= sqrt(α_t) * x_0 + sqrt(1 − α_t) * ϵ
+# x_t ​= sqrt(α_t) * x_0 + sqrt(1 − α_t) * ϵ
 def q_sample(x_start, t, noise=None):
     """
     Add noise to x_start at timestep t.
